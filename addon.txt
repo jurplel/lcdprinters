@@ -1,0 +1,9 @@
+"AddonInfo"
+{
+	"name"				"LCD Printers"
+	"version"			"1.0"
+	"author_name"			"jurplel"
+	"author_email"			""
+	"author_url"			""
+	"info"				"Custom money printers with a heat system and segmented LCD styling"
+}
