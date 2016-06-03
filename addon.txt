@@ -5,5 +5,5 @@
 	"author_name"			"jurplel"
 	"author_email"			""
 	"author_url"			""
-	"info"				"Custom money printers with a heat system and segmented LCD styling"
+	"info"				"Custom money printers for DarkRP with a heat system and a segmented aesthetic"
 }
