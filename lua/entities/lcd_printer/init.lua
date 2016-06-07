@@ -9,49 +9,33 @@ ENT.SeizeReward = LCD.Config.SeizeReward
 
 local PreMoney
 
-local PrinterStoredMoney = LCD.Config.StartingStoredMoney
-
-local PrinterTemperature = LCD.Config.StartingTemperature
-
-local PrinterExplosion = 0
-
-local PrinterCoolant = LCD.Config.StartingCoolant
-
-local PrinterFan = LCD.Config.StartingFan
-
-local PrinterScreen = LCD.Config.StartingScreen
-
-local PrinterStorage = LCD.Config.StartingStorage
-
-local PrinterArmor = LCD.Config.StartingArmor
-
-local PrinterMode = 0
-
 function ENT:Initialize()
 
-	PrinterStoredMoney = LCD.Config.StartingStoredMoney
+	self.PrinterStoredMoney = LCD.Config.StartingStoredMoney
 	self:SetNWInt( "StoredMoney", PrinterStoredMoney )
 
-	PrinterTemperature = LCD.Config.StartingTemperature
+	self.PrinterTemperature = LCD.Config.StartingTemperature
 	self:SetNWInt( "StoredTemp", PrinterTemperature )
 
-	PrinterExplosion = 0
+	self.PrinterExplosion = 0
 	self:SetNWInt( "StoredExpl", PrinterExplosion )
 
-	PrinterCoolant = LCD.Config.StartingCoolant
+	self.PrinterCoolant = LCD.Config.StartingCoolant
 	self:SetNWInt( "StoredCool", PrinterCoolant )
 
-	PrinterFan = LCD.Config.StartingFan
+	self.PrinterFan = LCD.Config.StartingFan
 	self:SetNWBool( "StoredFan", PrinterFan )
 
-	PrinterScreen = LCD.Config.StartingScreen
+	self.PrinterScreen = LCD.Config.StartingScreen
 	self:SetNWBool( "StoredScreen", PrinterScreen )
 
-	PrinterStorage = LCD.Config.StartingStorage
+	self.PrinterStorage = LCD.Config.StartingStorage
 	self:SetNWBool( "StoredStorage", PrinterStorage )
 
-	PrinterArmor = LCD.Config.StartingArmor
+	self.PrinterArmor = LCD.Config.StartingArmor
 	self:SetNWBool( "StoredArmor", PrinterArmor )
+
+	self.PrinterMode = 0
 
 	self:SetModel("models/props_c17/consolebox01a.mdl")
 	self:SetUseType(SIMPLE_USE)
@@ -62,7 +46,7 @@ function ENT:Initialize()
 	phys:Wake()
 
 	self.sparking = false
-	if PrinterArmor == false then
+	if self.PrinterArmor == false then
 		self.damage = LCD.Config.HitPoints
 	else
 		self.damage = LCD.Config.ArmorHitPoints
@@ -131,8 +115,8 @@ end
 
 function ENT:TestExplosion()
 	if not IsValid(self) or self:IsOnFire() then return end
-	local explchance = math.random(1,100)
-	if explchance <= PrinterExplosion then
+	self.explchance = math.random(1,100)
+	if self.explchance <= self.PrinterExplosion then
 		self:BurstIntoFlames()
 	else
 		DarkRP.notify(self:Getowning_ent(), 0, 4, "Your printer is in danger of exploding!")
@@ -155,51 +139,50 @@ end
 function ENT:AddMoney()
 	if not IsValid(self) or self:IsOnFire() then return end
 
-	if PrinterExplosion > 0 then
+	if self.PrinterExplosion > 0 then
 		self:TestExplosion()
 	end
-	local effectivestorage
-	if PrinterStorage == true then
-		effectivestorage = LCD.Config.UpgradeMaximum
+	if self.PrinterStorage == true then
+		self.effectivestorage = LCD.Config.UpgradeMaximum
 	else
-		effectivestorage = LCD.Config.PrintMaximum
+		self.effectivestorage = LCD.Config.PrintMaximum
 	end
-	if PrinterStoredMoney < effectivestorage then
-		if PrinterMode == 1 then
-			PrinterStoredMoney = PrinterStoredMoney + math.random(LCD.Config.OverclockerPrintAmount1, LCD.Config.OverclockerPrintAmount2)
+	if self.PrinterStoredMoney < self.effectivestorage then
+		if self.PrinterMode == 1 then
+			self.PrinterStoredMoney = self.PrinterStoredMoney + math.random(LCD.Config.OverclockerPrintAmount1, LCD.Config.OverclockerPrintAmount2)
 		else
-			PrinterStoredMoney = PrinterStoredMoney + math.random(LCD.Config.PrintAmount1, LCD.Config.PrintAmount2)
+			self.PrinterStoredMoney = self.PrinterStoredMoney + math.random(LCD.Config.PrintAmount1, LCD.Config.PrintAmount2)
 		end
-		self:SetNWInt( "StoredMoney", PrinterStoredMoney )
+		self:SetNWInt( "StoredMoney", self.PrinterStoredMoney )
 
 		self:EmitSound("buttons/button4.wav")
-		if PrinterMode == 1 then
-			if PrinterFan == false then
-				PrinterTemperature = PrinterTemperature + math.random(LCD.Config.OverclockerHeatNoFan1, LCD.Config.OverclockerHeatNoFan2)
+		if self.PrinterMode == 1 then
+			if self.PrinterFan == false then
+				self.PrinterTemperature = self.PrinterTemperature + math.random(LCD.Config.OverclockerHeatNoFan1, LCD.Config.OverclockerHeatNoFan2)
 			else
-				PrinterTemperature = PrinterTemperature + math.random(LCD.Config.OverclockerHeatFan1, LCD.Config.OverclockerHeatFan2)
+				self.PrinterTemperature = self.PrinterTemperature + math.random(LCD.Config.OverclockerHeatFan1, LCD.Config.OverclockerHeatFan2)
 			end
 		else
-			if PrinterFan == false then
-				PrinterTemperature = PrinterTemperature + math.random(LCD.Config.HeatNoFan1, LCD.Config.HeatNoFan2)
+			if self.PrinterFan == false then
+				self.PrinterTemperature = self.PrinterTemperature + math.random(LCD.Config.HeatNoFan1, LCD.Config.HeatNoFan2)
 			else
-				PrinterTemperature = PrinterTemperature + math.random(LCD.Config.HeatFan1, LCD.Config.HeatFan2)
+				self.PrinterTemperature = self.PrinterTemperature + math.random(LCD.Config.HeatFan1, LCD.Config.HeatFan2)
 			end
 		end
-		self:SetNWInt( "StoredTemp", PrinterTemperature )
+		self:SetNWInt( "StoredTemp", self.PrinterTemperature )
 
 	else
 		self:EmitSound("buttons/button8.wav")
 		DarkRP.notify(self:Getowning_ent(), 0, 4, "Your money printer is full!")
-		if PrinterFan == false then
-			PrinterTemperature = PrinterTemperature + math.random(LCD.Config.HeatNoFanFull1, LCD.Config.HeatNoFanFull2)
+		if self.PrinterFan == false then
+			self.PrinterTemperature = self.PrinterTemperature + math.random(LCD.Config.HeatNoFanFull1, LCD.Config.HeatNoFanFull2)
 		else
-			PrinterTemperature = PrinterTemperature + math.random(LCD.Config.HeatFanFull1, LCD.Config.HeatFanFull2)
+			self.PrinterTemperature = self.PrinterTemperature + math.random(LCD.Config.HeatFanFull1, LCD.Config.HeatFanFull2)
 		end
-		self:SetNWInt( "StoredTemp", PrinterTemperature )
+		self:SetNWInt( "StoredTemp", self.PrinterTemperature )
 	end
 	self.sparking = false
-	if PrinterMode == 1 then
+	if self.PrinterMode == 1 then
 		timer.Create( "PrinterCountdown2", math.random(LCD.Config.PrintTimer1,LCD.Config.PrintTimer2), 1, function() PreMoney(self) end)
 	else
 		timer.Create( "PrinterCountdown2", math.random(LCD.Config.OverclockerPrintTimer1,LCD.Config.OverclockerPrintTimer2), 1, function() PreMoney(self) end)
@@ -211,29 +194,29 @@ function ENT:CreateMoneybag( ply )
 
 	local MoneyPos = self:GetPos()
 
-	ply:addMoney(PrinterStoredMoney)
-	DarkRP.notify(ply, 0, 4, "Withdrew $" .. PrinterStoredMoney)
-	PrinterStoredMoney = 0
-	self:SetNWInt( "StoredMoney", PrinterStoredMoney )
+	ply:addMoney(self.PrinterStoredMoney)
+	DarkRP.notify(ply, 0, 4, "Withdrew $" .. self.PrinterStoredMoney)
+	self.PrinterStoredMoney = 0
+	self:SetNWInt( "StoredMoney", self.PrinterStoredMoney )
 	self:EmitSound("ambient/tones/equip3.wav")
 end
 
 -- the misc stuff
 
 function ENT:CoolOff()
-	if PrinterCoolant > 0 and PrinterTemperature > LCD.Config.CoolingMinTemperature then
+	if self.PrinterCoolant > 0 and self.PrinterTemperature > LCD.Config.CoolingMinTemperature then
 
-		PrinterCoolant = PrinterCoolant - LCD.Config.CoolingCoolant
-		self:SetNWInt( "StoredCool", PrinterCoolant )
+		self.PrinterCoolant = self.PrinterCoolant - LCD.Config.CoolingCoolant
+		self:SetNWInt( "StoredCool", self.PrinterCoolant )
 
-		PrinterTemperature = PrinterTemperature - LCD.Config.CoolingTemp
-		self:SetNWInt( "StoredTemp", PrinterTemperature )
+		self.PrinterTemperature = self.PrinterTemperature - LCD.Config.CoolingTemp
+		self:SetNWInt( "StoredTemp", self.PrinterTemperature )
 	end
 
 end
 
 function ENT:Use( ply )
-	if PrinterStoredMoney > 0 then
+	if self.PrinterStoredMoney > 0 then
 		self:CreateMoneybag( ply )
 	end
 end
@@ -242,39 +225,39 @@ function ENT:Think()
 
 	self:CoolOff()
 
-	local TempIncreaseChance = math.random(1,100)
-	if PrintMode == 1 then
-		if PrinterFan == false then
-			if TempIncreaseChance > LCD.Config.HeatChanceNoFan then
-				PrinterTemperature = PrinterTemperature + math.random(LCD.Config.OverclockerHeatAddedFan1, LCD.Config.OverclockerHeatAddedFan2)
-				self:SetNWInt( "StoredTemp", PrinterTemperature )
+	self.TempIncreaseChance = math.random(1,100)
+	if self.PrinterMode == 1 then
+		if self.PrinterFan == false then
+			if self.TempIncreaseChance > LCD.Config.HeatChanceNoFan then
+				self.PrinterTemperature = self.PrinterTemperature + math.random(LCD.Config.OverclockerHeatAddedFan1, LCD.Config.OverclockerHeatAddedFan2)
+				self:SetNWInt( "StoredTemp", self.PrinterTemperature )
 			end
 		else
-			if TempIncreaseChance > LCD.Config.HeatChanceFan then
-				PrinterTemperature = PrinterTemperature + math.random(LCD.Config.OverclockerHeatAddedNoFan1, LCD.Config.OverclockerHeatAddedNoFan2)
-				self:SetNWInt( "StoredTemp", PrinterTemperature )
+			if self.TempIncreaseChance > LCD.Config.HeatChanceFan then
+				self.PrinterTemperature = self.PrinterTemperature + math.random(LCD.Config.OverclockerHeatAddedNoFan1, LCD.Config.OverclockerHeatAddedNoFan2)
+				self:SetNWInt( "StoredTemp", self.PrinterTemperature )
 			end
 		end
 	else
-		if PrinterFan == false then
-			if TempIncreaseChance > LCD.Config.HeatChanceNoFan then
-				PrinterTemperature = PrinterTemperature + math.random(LCD.Config.HeatAddedFan1, LCD.Config.HeatAddedFan2)
-				self:SetNWInt( "StoredTemp", PrinterTemperature )
+		if self.PrinterFan == false then
+			if self.TempIncreaseChance > LCD.Config.HeatChanceNoFan then
+				self.PrinterTemperature = self.PrinterTemperature + math.random(LCD.Config.HeatAddedFan1, LCD.Config.HeatAddedFan2)
+				self:SetNWInt( "StoredTemp", self.PrinterTemperature )
 			end
 		else
-			if TempIncreaseChance > LCD.Config.HeatChanceFan then
-				PrinterTemperature = PrinterTemperature + math.random(LCD.Config.HeatAddedNoFan1, LCD.Config.HeatAddedNoFan2)
-				self:SetNWInt( "StoredTemp", PrinterTemperature )
+			if self.TempIncreaseChance > LCD.Config.HeatChanceFan then
+				self.PrinterTemperature = self.PrinterTemperature + math.random(LCD.Config.HeatAddedNoFan1, LCD.Config.HeatAddedNoFan2)
+				self:SetNWInt( "StoredTemp", self.PrinterTemperature )
 			end
 		end
 	end
 
-	if PrinterTemperature >= 65 then
-		PrinterExplosion = math.floor(((PrinterTemperature-65)/3.5)^2)
-		self:SetNWInt( "StoredExpl", PrinterExplosion )
+	if self.PrinterTemperature >= 65 then
+		self.PrinterExplosion = math.floor(((self.PrinterTemperature-65)/3.5)^2)
+		self:SetNWInt( "StoredExpl", self.PrinterExplosion )
 	else
-		PrinterExplosion = 0
-		self:SetNWInt( "StoredExpl", PrinterExplosion )
+		self.PrinterExplosion = 0
+		self:SetNWInt( "StoredExpl", self.PrinterExplosion )
 	end
 
 	if self:WaterLevel() > 0 then
@@ -311,12 +294,12 @@ end
 
 function ENT:PhysicsCollide(data, phys)
 
-	if PrinterFan == false then
+	if self.PrinterFan == false then
 		if (data.HitEntity:GetClass() == "lcd_fan") then
 			data.HitEntity:Remove()
 
-			PrinterFan = true
-			self:SetNWBool( "StoredFan", PrinterFan )
+			self.PrinterFan = true
+			self:SetNWBool( "StoredFan",  self.PrinterFan )
 
 			self:EmitSound("buttons/lever8.wav")
 			self.soundfan = CreateSound(self, Sound("ambient/tones/fan2_loop.wav"))
@@ -325,34 +308,34 @@ function ENT:PhysicsCollide(data, phys)
 		end
 	end
 	
-	if PrinterScreen == false then
+	if self.PrinterScreen == false then
 		if (data.HitEntity:GetClass() == "lcd_screen") then
 			data.HitEntity:Remove()
 
-			PrinterScreen = true
-			self:SetNWBool( "StoredScreen", PrinterScreen )
+			self.PrinterScreen = true
+			self:SetNWBool( "StoredScreen", self.PrinterScreen )
 
 			self:EmitSound("buttons/lever8.wav")
 		end
 	end
 
-	if PrinterStorage == false then
+	if self.PrinterStorage == false then
 		if (data.HitEntity:GetClass() == "lcd_storage") then
 			data.HitEntity:Remove()
 
-			PrinterStorage = true
-			self:SetNWBool( "StoredStorage", PrinterStorage )
+			self.PrinterStorage = true
+			self:SetNWBool( "StoredStorage", self.PrinterStorage )
 
 			self:EmitSound("buttons/lever8.wav")
 		end
 	end
 
-	if PrinterArmor == false then
+	if self.PrinterArmor == false then
 		if (data.HitEntity:GetClass() == "lcd_armor") then
 			data.HitEntity:Remove()
 
-			PrinterArmor = true
-			self:SetNWBool( "StoredArmor", PrinterArmor )
+			self.PrinterArmor = true
+			self:SetNWBool( "StoredArmor", self.PrinterArmor )
 
 			self:EmitSound("buttons/lever8.wav")
 			
@@ -360,24 +343,24 @@ function ENT:PhysicsCollide(data, phys)
 		end
 	end
 
-	if (data.HitEntity:GetClass() == "lcd_coolant") and PrinterCoolant <= LCD.Config.CoolantAdded then
+	if (data.HitEntity:GetClass() == "lcd_coolant") and self.PrinterCoolant <= LCD.Config.CoolantAdded then
 		data.HitEntity:Remove()
 
-		PrinterCoolant = PrinterCoolant + LCD.Config.CoolantAdded
-		self:SetNWInt( "StoredCool", PrinterCoolant )
-	elseif (data.HitEntity:GetClass() == "lcd_coolant") and PrinterCoolant > 20 - LCD.Config.CoolantAdded and PrinterCoolant < 20 then
+		self.PrinterCoolant = self.PrinterCoolant + LCD.Config.CoolantAdded
+		self:SetNWInt( "StoredCool", self.PrinterCoolant )
+	elseif (data.HitEntity:GetClass() == "lcd_coolant") and self.PrinterCoolant > 20 - LCD.Config.CoolantAdded and self.PrinterCoolant < 20 then
 		data.HitEntity:Remove()
 
-		PrinterCoolant = PrinterCoolant + (20 - PrinterCoolant)
-		self:SetNWInt( "StoredCool", PrinterCoolant )
+		self.PrinterCoolant = self.PrinterCoolant + (20 - self.PrinterCoolant)
+		self:SetNWInt( "StoredCool", self.PrinterCoolant )
 	end
 
-	if PrinterMode == 0 then
+	if self.PrinterMode == 0 then
 		if (data.HitEntity:GetClass() == "lcd_overclocker") then
 			data.HitEntity:Remove()
 
-			PrinterMode = 1
-			self:SetNWInt( "StoredMode", PrinterMode )
+			self.PrinterMode = 1
+			self:SetNWInt( "StoredMode", self.PrinterMode )
 
 			self:EmitSound("buttons/lever8.wav")
 		end
