@@ -1,6 +1,3 @@
---[[---------------------------------------------------------------------------
-This is an example of a custom entity.
----------------------------------------------------------------------------]]
 AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")
 include("shared.lua")
@@ -37,6 +34,8 @@ function ENT:Initialize()
 
 	self.PrinterMode = 0
 
+	self.id = self:GetCreationID()
+
 	self:SetModel("models/props_c17/consolebox01a.mdl")
 	self:SetUseType(SIMPLE_USE)
 	self:PhysicsInit(SOLID_VPHYSICS)
@@ -53,7 +52,7 @@ function ENT:Initialize()
 	end
 	self.IsMoneyPrinter = true
 
-	timer.Create( "PrinterCountdown1", math.random(LCD.Config.PrintTimer1,LCD.Config.PrintTimer2), 1, function() PreMoney(self) end)
+	timer.Create( "PrinterCountdown1-" .. self.id, math.random(LCD.Config.PrintTimer1,LCD.Config.PrintTimer2), 1, function() PreMoney(self) end)
 
 	self.sound = CreateSound(self, Sound("ambient/levels/labs/equipment_printer_loop1.wav"))
 	self.sound:SetSoundLevel(52)
@@ -183,9 +182,9 @@ function ENT:AddMoney()
 	end
 	self.sparking = false
 	if self.PrinterMode == 1 then
-		timer.Create( "PrinterCountdown2", math.random(LCD.Config.PrintTimer1,LCD.Config.PrintTimer2), 1, function() PreMoney(self) end)
+		timer.Create( "PrinterCountdown2-" .. self.id, math.random(LCD.Config.OverclockerPrintTimer1,LCD.Config.OverclockerPrintTimer2), 1, function() PreMoney(self) end)
 	else
-		timer.Create( "PrinterCountdown2", math.random(LCD.Config.OverclockerPrintTimer1,LCD.Config.OverclockerPrintTimer2), 1, function() PreMoney(self) end)
+		timer.Create( "PrinterCountdown2-" .. self.id, math.random(LCD.Config.PrintTimer1,LCD.Config.PrintTimer2), 1, function() PreMoney(self) end)
 	end
 end
 
@@ -266,15 +265,15 @@ function ENT:Think()
 		return
 	end
 
-	if (timer.Exists( "PrinterCountdown1" )) then
-		local count1 = math.floor(timer.TimeLeft( "PrinterCountdown1" ))
+	if (timer.Exists( "PrinterCountdown1-" .. self.id )) then
+		local count1 = math.floor(timer.TimeLeft( "PrinterCountdown1-" .. self.id ))
 		if count1 <= 9999 then
 			self:SetNWInt( "StoredCount", count1 )
 		else
 			self:SetNWInt( "StoredCount", 0 )
 		end
 	else
-		local count2 = math.floor(timer.TimeLeft( "PrinterCountdown2" ))
+		local count2 = math.floor(timer.TimeLeft( "PrinterCountdown2-" .. self.id ))
 		if count2 <= 9999 then
 			self:SetNWInt( "StoredCount", count2 )
 		else
