@@ -295,7 +295,11 @@ function ENT:PhysicsCollide(data, phys)
 
 	if self.PrinterFan == false then
 		if (data.HitEntity:GetClass() == "lcd_fan") then
-			data.HitEntity:Remove()
+			timer.Simple(0, function()
+				if (IsValid(self)) then
+					data.HitEntity:Remove()
+				end
+			end)
 
 			self.PrinterFan = true
 			self:SetNWBool( "StoredFan",  self.PrinterFan )
@@ -309,7 +313,13 @@ function ENT:PhysicsCollide(data, phys)
 	
 	if self.PrinterScreen == false then
 		if (data.HitEntity:GetClass() == "lcd_screen") then
-			data.HitEntity:Remove()
+			timer.Simple(0, function()
+				if (IsValid(self)) then
+					timer.Simple(0, function()
+						data.HitEntity:Remove()
+					end)
+				end
+			end)
 
 			self.PrinterScreen = true
 			self:SetNWBool( "StoredScreen", self.PrinterScreen )
@@ -320,7 +330,11 @@ function ENT:PhysicsCollide(data, phys)
 
 	if self.PrinterStorage == false then
 		if (data.HitEntity:GetClass() == "lcd_storage") then
-			data.HitEntity:Remove()
+			timer.Simple(0, function()
+				if (IsValid(self)) then
+					data.HitEntity:Remove()
+				end
+			end)
 
 			self.PrinterStorage = true
 			self:SetNWBool( "StoredStorage", self.PrinterStorage )
@@ -331,7 +345,11 @@ function ENT:PhysicsCollide(data, phys)
 
 	if self.PrinterArmor == false then
 		if (data.HitEntity:GetClass() == "lcd_armor") then
-			data.HitEntity:Remove()
+			timer.Simple(0, function()
+				if (IsValid(self)) then
+					data.HitEntity:Remove()
+				end
+			end)
 
 			self.PrinterArmor = true
 			self:SetNWBool( "StoredArmor", self.PrinterArmor )
@@ -343,12 +361,20 @@ function ENT:PhysicsCollide(data, phys)
 	end
 
 	if (data.HitEntity:GetClass() == "lcd_coolant") and self.PrinterCoolant <= LCD.Config.CoolantAdded then
-		data.HitEntity:Remove()
+		timer.Simple(0, function()
+			if (IsValid(self)) then
+				data.HitEntity:Remove()
+			end
+		end)
 
 		self.PrinterCoolant = self.PrinterCoolant + LCD.Config.CoolantAdded
 		self:SetNWInt( "StoredCool", self.PrinterCoolant )
 	elseif (data.HitEntity:GetClass() == "lcd_coolant") and self.PrinterCoolant > 20 - LCD.Config.CoolantAdded and self.PrinterCoolant < 20 then
-		data.HitEntity:Remove()
+		timer.Simple(0, function()
+			if (IsValid(self)) then
+				data.HitEntity:Remove()
+			end
+		end)
 
 		self.PrinterCoolant = self.PrinterCoolant + (20 - self.PrinterCoolant)
 		self:SetNWInt( "StoredCool", self.PrinterCoolant )
@@ -356,7 +382,11 @@ function ENT:PhysicsCollide(data, phys)
 
 	if self.PrinterMode == 0 then
 		if (data.HitEntity:GetClass() == "lcd_overclocker") then
-			data.HitEntity:Remove()
+			timer.Simple(0, function()
+				if (IsValid(self)) then
+					data.HitEntity:Remove()
+				end
+			end)
 
 			self.PrinterMode = 1
 			self:SetNWInt( "StoredMode", self.PrinterMode )
